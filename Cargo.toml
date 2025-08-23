@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 gdal = { version = "0.18.0", features = ["ndarray"] }
 clap = { version = "4.5.41", features = ["derive"] }
+ndarray = "0.16.1"
