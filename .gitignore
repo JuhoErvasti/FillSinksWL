@@ -1,2 +1,4 @@
 /target
 /out.tif
+/in.tif
+*.aux.xml
