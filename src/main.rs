@@ -26,7 +26,6 @@ pub fn error_handler(class: gdal::errors::CplErrType, number: i32, message: &str
         },
         gdal::errors::CplErrType::Failure => {
             eprintln!("{msg}");
-            panic!("Received a GDAL error, terminating program!");
         },
         gdal::errors::CplErrType::Fatal => {
             eprintln!("{msg}");
@@ -59,6 +58,8 @@ fn show_short_usage() {
 }
 
 fn main() {
+    gdal::config::set_error_handler(error_handler);
+
     let cli = Cli::parse();
     let input = Path::new(cli.input.as_str());
     let output = Path::new(cli.output.as_str());
