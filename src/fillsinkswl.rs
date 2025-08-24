@@ -92,7 +92,7 @@ fn is_in_array(pos: (i64, i64), shape: (usize, usize)) -> bool {
     y < height.try_into().unwrap() && x < width.try_into().unwrap() && y >= 0 && x >= 0
 }
 
-pub fn fill_sinks_wl(
+pub fn fill_sinks_wang_liu(
     elevation: &ndarray::Array2<f64>,
     minimum_slope: f64,
     nodata: f64,

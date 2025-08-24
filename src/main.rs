@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use clap::{CommandFactory, Parser};
-use fillsinkswl::fillsinkswl::fill_sinks_wl;
+use fillsinkswl::fillsinkswl::fill_sinks_wang_liu;
 
 pub fn error_handler(class: gdal::errors::CplErrType, number: i32, message: &str) {
     let class_str = match class {
@@ -168,7 +168,7 @@ fn main() {
             },
         };
 
-        let out_array = fill_sinks_wl(
+        let out_array = fill_sinks_wang_liu(
             &mut in_array,
             minslope,
             nodata,
