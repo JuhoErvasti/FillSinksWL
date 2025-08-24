@@ -91,7 +91,24 @@ impl Direction {
     }
 }
 
-fn is_boundary(pos: (usize, usize), shape: (usize, usize)) -> bool {
+/// Checks if given position is a boundary cell in an array with the given shape. Rows are
+/// specified first in both position and shape, i.e. (y, x) and (height, width).
+///
+/// # Examples
+///
+/// ```rust
+/// use fillsinkswl::fillsinkswl::is_boundary;
+///
+/// let pos = (99, 200);
+/// let shape = (100, 300);
+///
+/// assert!(is_boundary(pos, shape));
+/// ```
+///
+/// # Panics
+///
+/// Will panic if width or height won't fit into an i64
+pub fn is_boundary(pos: (usize, usize), shape: (usize, usize)) -> bool {
     let (y, x) = pos;
     let (height, width) = shape;
 
@@ -99,13 +116,31 @@ fn is_boundary(pos: (usize, usize), shape: (usize, usize)) -> bool {
     y == 0 || x == 0 || y == height - 1 || x == width - 1
 }
 
-fn is_in_array(pos: (i64, i64), shape: (usize, usize)) -> bool {
+/// Checks if given position is inside an array of given shape). Rows are specified first in both
+/// position and shape, i.e. (y, x) and (height, width).
+///
+/// # Examples
+///
+/// ```rust
+/// use fillsinkswl::fillsinkswl::is_in_array;
+///
+/// let pos = (-1, 200);
+/// let shape = (100, 300);
+///
+/// assert!(!is_in_array(pos, shape));
+/// ```
+///
+/// # Panics
+///
+/// Will panic if width or height won't fit into an i64
+pub fn is_in_array(pos: (i64, i64), shape: (usize, usize)) -> bool {
     let (y, x) = pos;
     let (height, width) = shape;
 
     y < height.try_into().unwrap() && x < width.try_into().unwrap() && y >= 0 && x >= 0
 }
 
+/// Run Wang & Liu Fill Sinks algorithm. Returns filled raster as a 2D array.
 pub fn fill_sinks_wang_liu(
     elevation: &ndarray::Array2<f64>,
     minimum_slope: f64,
@@ -206,3 +241,31 @@ pub fn fill_sinks_wang_liu(
     filled
 }
 
+#[cfg(test)]
+mod test {
+    use super::*;
+    use ndarray::array;
+
+    #[test]
+    fn test_fill_sinks_wang_liu() {
+        let input = array![
+            [15., 15., 14., 15., 12., 6.,  12.],
+            [14., 13., 10., 12., 15., 17., 15.],
+            [15., 15., 9.,  11., 8.,  15., 15.],
+            [16., 17., 8.,  16., 15., 7.,  5. ],
+            [19., 18., 19., 18., 17., 15., 14.],
+        ];
+
+        let expected = array![
+            [15., 15., 14., 15., 12., 6.0, 12.],
+            [14., 13., 11., 12., 15., 17., 15.],
+            [15., 15., 11., 11., 8.0, 15., 15.],
+            [16., 17., 11., 16., 15., 7.0, 5.0],
+            [19., 18., 19., 18., 17., 15., 14.]
+        ];
+
+        let output = fill_sinks_wang_liu(&input, 0.0, -9999., 1., 1.);
+
+        assert_eq!(output, expected);
+    }
+}
