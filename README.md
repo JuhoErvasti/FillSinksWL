@@ -44,3 +44,9 @@ fillsinkswl input.tif output.tif --minimum-slope=0.1
 ### Dependencies
 
 [GDAL >= 3.4](https://gdal.org/en/stable/download.html)
+
+### With Cargo from GitHub
+
+```shell
+cargo install --git https://github.com/JuhoErvasti/FillSinksWL
+```
