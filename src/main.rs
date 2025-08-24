@@ -42,7 +42,7 @@ struct Cli {
     input: String,
     output: String,
 
-    #[arg(long = "minimum-slope", value_name = "MINIMUM_SLOPE", help = "Minimum Slope in degrees")]
+    #[arg(long = "minimum-slope", value_name = "MINIMUM_SLOPE", help = "Minimum Slope in degrees. Default is 0.0")]
     minslope: Option<f64>,
 
     #[arg(long = "overwrite", value_name = "OVERWRITE", help = "Allow overwriting output file")]
@@ -115,6 +115,7 @@ fn main() {
                 return ();
             },
         };
+
         let in_buffer: gdal::raster::Buffer<f64> = match in_band.read_band_as() {
             Ok(buffer) => buffer,
             Err(err) => {
@@ -160,6 +161,25 @@ fn main() {
             },
         }
 
+        let mut y_res = 1.;
+        let mut x_res = 1.;
+        match ds.geo_transform() {
+            Ok(gt) => {
+                y_res = gt[1];
+                x_res = gt[5];
+                match out_ds.set_geo_transform(&gt) {
+                    Ok(_) => (),
+                    Err(err) => {
+                        println!("WARNING: Could not set output geotransform: {err}");
+                    },
+                }
+            },
+            Err(err) => {
+                println!("WARNING: Could not read input geotransform: {err}");
+                println!("WARNING: Output geotransform not set!");
+            },
+        }
+
         let nodata = match in_band.no_data_value() {
             Some(value) => value,
             None => {
@@ -172,6 +192,8 @@ fn main() {
             &mut in_array,
             minslope,
             nodata,
+            y_res,
+            x_res,
         );
 
         let mut out_band = match out_ds.rasterband(1) {

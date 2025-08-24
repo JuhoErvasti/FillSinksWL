@@ -61,6 +61,20 @@ impl Direction {
         }
     }
 
+    pub fn length(&self, y_res: f64, x_res: f64) -> f64 {
+        match self {
+            Direction::North => y_res,
+            Direction::East => x_res,
+            Direction::South => y_res,
+            Direction::West => x_res,
+            Direction::NorthEast | Direction::SouthEast | Direction::SouthWest | Direction::NorthWest => (y_res * y_res.abs() + x_res.abs() * x_res.abs()).sqrt(),
+        }
+    }
+
+    pub fn mindiff(&self, minslope: f64, y_res: f64, x_res: f64) -> f64 {
+        self.length(y_res, x_res) * minslope
+    }
+
     pub fn iterator() -> Iter<'static, Direction> {
         static DIRECTIONS: [Direction; 8] = [
             Direction::North,
@@ -96,7 +110,28 @@ pub fn fill_sinks_wang_liu(
     elevation: &ndarray::Array2<f64>,
     minimum_slope: f64,
     nodata: f64,
+    y_res: f64,
+    x_res: f64,
 ) -> ndarray::Array2<f64> {
+    let mut minslope = minimum_slope;
+    let mut mindiffs= [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    ];
+    if minimum_slope > 0.0 {
+        minslope = minslope.to_radians().tan();
+
+        for (i, dir) in Direction::iterator().enumerate() {
+            mindiffs[i] = dir.mindiff(minslope, y_res.abs(), x_res.abs());
+        }
+    }
+
     let mut queue: std::collections::BinaryHeap<Node> = std::collections::BinaryHeap::new();
     let shape = (elevation.shape()[0], elevation.shape()[1]);
 
@@ -130,7 +165,7 @@ pub fn fill_sinks_wang_liu(
         let x = node.x;
         let z = filled[[y as usize, x as usize]];
 
-        for dir in Direction::iterator() {
+        for (i, dir) in Direction::iterator().enumerate() {
             let (dy, dx) = dir.delta((y as i64, x as i64));
 
             if !is_in_array((dy, dx), shape) {
@@ -147,7 +182,12 @@ pub fn fill_sinks_wang_liu(
 
             let mut dz = elevation[[dy as usize, dx as usize]];
 
-            if dz < z {
+            if minslope > 0.0 {
+                let mindiff = mindiffs[i];
+                if dz < (z + mindiff) {
+                    dz = z + mindiff;
+                }
+            } else if dz < z {
                 dz = z;
             }
 
