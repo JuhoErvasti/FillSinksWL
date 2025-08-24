@@ -67,7 +67,7 @@ impl Direction {
             Direction::East => x_res,
             Direction::South => y_res,
             Direction::West => x_res,
-            Direction::NorthEast | Direction::SouthEast | Direction::SouthWest | Direction::NorthWest => (y_res * y_res.abs() + x_res.abs() * x_res.abs()).sqrt(),
+            Direction::NorthEast | Direction::SouthEast | Direction::SouthWest | Direction::NorthWest => (y_res * y_res + x_res * x_res).sqrt(),
         }
     }
 
