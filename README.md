@@ -45,6 +45,10 @@ fillsinkswl input.tif output.tif --minimum-slope=0.1
 
 [GDAL >= 3.4](https://gdal.org/en/stable/download.html)
 
+### Ubuntu/Debian
+
+You can download a deb package from the latest release [here](https://github.com/JuhoErvasti/FillSinksWL/releases/latest).
+
 ### With Cargo from GitHub
 
 ```shell
