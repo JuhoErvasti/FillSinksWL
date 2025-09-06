@@ -2,6 +2,9 @@
 name = "fillsinkswl"
 version = "0.1.0"
 edition = "2024"
+authors = ["Juho Ervasti <juho.ervasti@gispo.fi>"]
+license = "MIT"
+description = "Rust implementation of the Fill Sinks algorithm proposed by Wang & Liu"
 
 [dependencies]
 gdal = { version = "0.18.0", features = ["ndarray"] }
